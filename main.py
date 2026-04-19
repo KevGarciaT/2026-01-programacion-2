@@ -1,56 +1,62 @@
-# Mapeo de precios según la tabla del consultorio
-precios = {
+# Price mapping based on the dental clinic's business rules
+prices = {
     "Particular": {
-        "cita": 80000,
-        "atenciones": {"Limpieza": 60000, "Calzas": 80000, "Extracción": 100000, "Diagnóstico": 50000}
+        "appointment_fee": 80000,
+        "services": {"Cleaning": 60000, "Fillings": 80000, "Extraction": 100000, "Diagnosis": 50000}
     },
     "Eps": {
-        "cita": 5000,
-        "atenciones": {"Limpieza": 0, "Calzas": 40000, "Extracción": 40000, "Diagnóstico": 0}
+        "appointment_fee": 5000,
+        "services": {"Cleaning": 0, "Fillings": 40000, "Extraction": 40000, "Diagnosis": 0}
     },
-    "Prepagada": {
-        "cita": 30000,
-        "atenciones": {"Limpieza": 0, "Calzas": 10000, "Extracción": 10000, "Diagnóstico": 0}
+    "Prepaid": {
+        "appointment_fee": 30000,
+        "services": {"Cleaning": 0, "Fillings": 10000, "Extraction": 10000, "Diagnosis": 0}
     }
 }
 
-clientes = []
+clients = []
 
 while True:
-    print("\n--- REGISTRO DE CITA ODONTOLÓGICA ---")
-    cedula = input("Cédula (o 'fin' para terminar): ")
-    if cedula.lower() == 'fin': break
+    print("\n--- DENTAL CLINIC REGISTRATION SYSTEM ---")
+    id_card = input("ID Card Number (or type 'exit' to finish): ")
+    if id_card.lower() == 'exit': 
+        break
     
-    nombre = input("Nombre: ")
-    tipo_cliente = input("Tipo Cliente (Particular, EPS, Prepagada): ").capitalize()
-    tipo_atencion = input("Atención (Limpieza, Calzas, Extracción, Diagnóstico): ").capitalize()
+    name = input("Client Name: ")
+    client_type = input("Client Type (Particular, Eps, Prepaid): ").capitalize()
+    service_type = input("Service (Cleaning, Fillings, Extraction, Diagnosis): ").capitalize()
     
-    if tipo_atencion in ["Limpieza", "Diagnóstico"]:
-        cantidad = 1
+    # Validation for quantity according to rules
+    if service_type in ["Cleaning", "Diagnosis"]:
+        quantity = 1
     else:
-        cantidad = int(input("Cantidad: "))
+        quantity = int(input("Quantity of teeth/fillings: "))
         
-    # Cálculos
-    v_cita = precios[tipo_cliente]["cita"]
-    v_atencion = precios[tipo_cliente]["atenciones"][tipo_atencion]
-    total_pagar = v_cita + (v_atencion * cantidad)
+    # Financial calculations
+    app_fee = prices[client_type]["appointment_fee"]
+    service_fee = prices[client_type]["services"][service_type]
+    total_to_pay = app_fee + (service_fee * quantity)
     
-    # Guardar datos
-    clientes.append({
-        "cedula": cedula,
-        "nombre": nombre,
-        "atencion": tipo_atencion,
-        "total": total_pagar
+    # Storing data in a list of dictionaries
+    clients.append({
+        "id": id_card,
+        "name": name,
+        "service": service_type,
+        "total": total_to_pay
     })
 
-# --- REPORTES FINALES ---
-if clientes:
-    print(f"\nTotal Clientes: {len(clientes)}")
-    print(f"Ingresos Totales: ${sum(c['total'] for c in clientes)}")
+# --- FINAL REPORTS ---
+if clients:
+    total_revenue = sum(c['total'] for c in clients)
+    extractions_count = len([c for c in clients if c['service'] == "Extraction"])
     
-    # Ordenar por valor de mayor a menor
-    clientes_ordenados = sorted(clientes, key=lambda x: x['total'], reverse=True)
+    print(f"\nTotal Clients: {len(clients)}")
+    print(f"Total Revenue: ${total_revenue}")
+    print(f"Number of Extraction services: {extractions_count}")
     
-    print("\n--- LISTA DE CLIENTES (MAYOR A MENOR PAGO) ---")
-    for c in clientes_ordenados:
-        print(f"Nombre: {c['nombre']} - Total: ${c['total']}")
+    # Sorting by total value paid (Highest to Lowest)
+    sorted_clients = sorted(clients, key=lambda x: x['total'], reverse=True)
+    
+    print("\n--- CLIENT LIST (SORTED BY HIGHEST REVENUE) ---")
+    for c in sorted_clients:
+        print(f"Name: {c['name']} | ID: {c['id']} | Total: ${c['total']}")
